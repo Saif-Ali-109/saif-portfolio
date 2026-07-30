@@ -17,6 +17,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
+
+@app.on_event("startup")
+async def build_index():
+    index_knowledge_base()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,

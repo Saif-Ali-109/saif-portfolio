@@ -171,7 +171,7 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_AI_API_URL || 'http://localhost:8001';
+      const API_URL = process.env.NEXT_PUBLIC_AI_API_URL || '';
       const response = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: {
@@ -199,8 +199,11 @@ export default function Chatbot() {
       setMessages(prev => [...prev, assistantMsg]);
     } catch (e) {
       console.error("Failed to communicate with AI Assistant:", e);
-      const apiUrl = process.env.NEXT_PUBLIC_AI_API_URL || 'http://localhost:8001';
-      setErrorMsg(`Failed to connect to the AI assistant. Please ensure the Python backend is running at ${apiUrl}.`);
+      const apiUrl = process.env.NEXT_PUBLIC_AI_API_URL;
+      const msg = apiUrl
+        ? `Failed to connect to the AI assistant at ${apiUrl}.`
+        : "Failed to connect to the AI assistant.";
+      setErrorMsg(msg);
       
       const errorReply: Message = {
         role: 'assistant',

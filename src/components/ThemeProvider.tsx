@@ -21,11 +21,13 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const stored = localStorage.getItem('theme') as Theme | null;
     const initial = stored || 'crystal';
-    setTheme(initial);
     document.documentElement.classList.toggle('dark', initial === 'dark');
+    setTimeout(() => {
+      setTheme(initial);
+      setMounted(true);
+    }, 0);
   }, []);
 
   const toggleTheme = () => {
