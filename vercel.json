@@ -1,7 +1,13 @@
 {
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     { "source": "/chat", "destination": "/api" },
     { "source": "/health", "destination": "/api" },
-    { "source": "/ingest", "destination": "/api" }
+    { "source": "/ingest", "destination": "/api" },
+    { "source": "/debug", "destination": "/api" }
   ]
 }
