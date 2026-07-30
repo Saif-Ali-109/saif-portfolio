@@ -48,7 +48,7 @@ async def chat(request: ChatRequest):
         response = generate_response(request.message, request.history)
         return ChatResponse(response=response, session_id=request.session_id)
     except Exception as e:
-        return ChatResponse(response=f"Error: {str(e)}", session_id=request.session_id)
+        return ChatResponse(response="Sorry, I'm having trouble connecting to the AI right now. Please try again later.", session_id=request.session_id)
 
 
 @app.post("/ingest", response_model=IngestResponse)
