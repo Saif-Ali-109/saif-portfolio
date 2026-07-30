@@ -5,6 +5,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+FALLBACK_MODELS = os.getenv("FALLBACK_MODELS", "gemini-2.0-flash,gemini-1.5-flash").split(",")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
 KNOWLEDGE_DIR = os.getenv("KNOWLEDGE_DIR", os.path.join(os.path.dirname(os.path.dirname(__file__)), "knowledge"))
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "500"))

@@ -4,7 +4,7 @@ import time
 import google.genai as genai
 from google.genai import types
 
-from app.config import GEMINI_API_KEY, GEMINI_MODEL, MAX_HISTORY
+from app.config import GEMINI_API_KEY, GEMINI_MODEL, FALLBACK_MODELS, MAX_HISTORY
 from app.prompts import SYSTEM_PROMPT, RAG_PROMPT_TEMPLATE
 from app.retriever import retrieve_context
 from app.models import ChatMessage
@@ -32,29 +32,40 @@ def build_contents(history: list[ChatMessage], prompt: str) -> list[types.Conten
     return contents
 
 
+def _try_model(client, model: str, contents, config):
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = client.models.generate_content(
+                model=model, contents=contents, config=config
+            )
+            if response.text:
+                return response.text.strip()
+            return "I'm currently unable to process that request. Please try again."
+        except Exception as e:
+            if "503" in str(e) or "UNAVAILABLE" in str(e):
+                if attempt < MAX_RETRIES - 1:
+                    time.sleep(2 ** attempt)
+                continue
+            raise
+    return None
+
+
 def generate_response(user_message: str, history: list[ChatMessage]) -> str:
     context = retrieve_context(user_message)
     prompt = RAG_PROMPT_TEMPLATE.format(context=context, question=user_message)
     contents = build_contents(history, prompt)
 
     client = _get_client()
-    last_error = None
-    for attempt in range(MAX_RETRIES):
-        try:
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    temperature=AI_TEMPERATURE,
-                    max_output_tokens=AI_MAX_OUTPUT_TOKENS,
-                ),
-            )
-            if response.text:
-                return response.text.strip()
-            return "I'm currently unable to process that request. Please try again."
-        except Exception as e:
-            last_error = e
-            if attempt < MAX_RETRIES - 1:
-                time.sleep(2 ** attempt)
-    raise last_error
+    config = types.GenerateContentConfig(
+        system_instruction=SYSTEM_PROMPT,
+        temperature=AI_TEMPERATURE,
+        max_output_tokens=AI_MAX_OUTPUT_TOKENS,
+    )
+
+    models = [GEMINI_MODEL] + [m for m in FALLBACK_MODELS if m]
+    for model in models:
+        result = _try_model(client, model, contents, config)
+        if result is not None:
+            return result
+
+    raise Exception(f"All models unavailable: {', '.join(models)}")
