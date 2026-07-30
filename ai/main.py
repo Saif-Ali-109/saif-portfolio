@@ -17,10 +17,11 @@ app = FastAPI(
     version="1.0.0",
 )
 
-
-@app.on_event("startup")
-async def build_index():
+# Index at import time for Vercel serverless compatibility
+try:
     index_knowledge_base()
+except Exception:
+    pass
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,8 +44,11 @@ async def health():
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    response = generate_response(request.message, request.history)
-    return ChatResponse(response=response, session_id=request.session_id)
+    try:
+        response = generate_response(request.message, request.history)
+        return ChatResponse(response=response, session_id=request.session_id)
+    except Exception as e:
+        return ChatResponse(response=f"Error: {str(e)}", session_id=request.session_id)
 
 
 @app.post("/ingest", response_model=IngestResponse)

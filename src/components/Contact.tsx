@@ -45,8 +45,7 @@ const Contact = () => {
               className={`p-8 border rounded-sm transition-all group block ${isDark ? 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
             >
               <Mail className="text-[var(--accent)] mb-6 group-hover:scale-110 transition-transform" size={24} />
-              <p className={`text-[10px] uppercase font-bold tracking-widest mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Email</p>
-              <p className={`text-sm font-medium break-all ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>rsaif6863322@gmail.com</p>
+              <p className={`text-[10px] uppercase font-bold tracking-widest mb-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Email</p>
             </a>
 
             <a
@@ -56,8 +55,7 @@ const Contact = () => {
               className={`p-8 border rounded-sm transition-all group ${isDark ? 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
             >
               <MessageCircle className="text-green-400 mb-6 group-hover:scale-110 transition-transform" size={24} />
-              <p className={`text-[10px] uppercase font-bold tracking-widest mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>WhatsApp</p>
-              <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Connect on WA</p>
+              <p className={`text-[10px] uppercase font-bold tracking-widest mb-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>WhatsApp</p>
             </a>
 
             <a
@@ -67,10 +65,7 @@ const Contact = () => {
               className={`p-8 border rounded-sm transition-all group ${isDark ? 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
             >
               <GithubIcon />
-              <div className="mt-6">
-                <p className={`text-[10px] uppercase font-bold tracking-widest mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>GitHub</p>
-                <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Saif-Ali-109</p>
-              </div>
+              <p className={`text-[10px] uppercase font-bold tracking-widest mb-6 mt-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>GitHub</p>
             </a>
 
             <a
@@ -80,10 +75,7 @@ const Contact = () => {
               className={`p-8 border rounded-sm transition-all group ${isDark ? 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]' : 'border-gray-200 bg-white hover:bg-gray-50'}`}
             >
               <LinkedInIcon />
-              <div className="mt-6">
-                <p className={`text-[10px] uppercase font-bold tracking-widest mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>LinkedIn</p>
-                <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>SaifAli109</p>
-              </div>
+              <p className={`text-[10px] uppercase font-bold tracking-widest mb-6 mt-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>LinkedIn</p>
             </a>
 
             <div className={`p-8 border rounded-sm transition-all group ${isDark ? 'border-white/5 bg-white/[0.03] hover:bg-white/[0.06]' : 'border-gray-200 bg-white hover:bg-gray-50'}`}>
@@ -93,8 +85,7 @@ const Contact = () => {
                 className="block"
               >
                 <MapPin className="text-[var(--accent)] mb-6 group-hover:scale-110 transition-transform" size={24} />
-                <p className={`text-[10px] uppercase font-bold tracking-widest mb-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Location</p>
-                <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Islamabad, PK</p>
+                <p className={`text-[10px] uppercase font-bold tracking-widest mb-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Location</p>
               </a>
             </div>
           </div>
