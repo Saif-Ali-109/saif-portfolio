@@ -1,4 +1,5 @@
 import os
+import time
 
 import google.genai as genai
 from google.genai import types
@@ -10,6 +11,7 @@ from app.models import ChatMessage
 
 AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "0.7"))
 AI_MAX_OUTPUT_TOKENS = int(os.getenv("AI_MAX_OUTPUT_TOKENS", "250"))
+MAX_RETRIES = 3
 
 _client = None
 
@@ -36,17 +38,23 @@ def generate_response(user_message: str, history: list[ChatMessage]) -> str:
     contents = build_contents(history, prompt)
 
     client = _get_client()
-    response = client.models.generate_content(
-        model=GEMINI_MODEL,
-        contents=contents,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=AI_TEMPERATURE,
-            max_output_tokens=AI_MAX_OUTPUT_TOKENS,
-        ),
-    )
-
-    if response.text:
-        return response.text.strip()
-
-    return "I'm currently unable to process that request. Please try again."
+    last_error = None
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    temperature=AI_TEMPERATURE,
+                    max_output_tokens=AI_MAX_OUTPUT_TOKENS,
+                ),
+            )
+            if response.text:
+                return response.text.strip()
+            return "I'm currently unable to process that request. Please try again."
+        except Exception as e:
+            last_error = e
+            if attempt < MAX_RETRIES - 1:
+                time.sleep(2 ** attempt)
+    raise last_error

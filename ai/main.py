@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.models import ChatRequest, ChatResponse, HealthResponse, IngestResponse
 from app.rag import generate_response
-from app.ingest import index_knowledge_base, get_store
+from app.ingest import index_knowledge_base
 
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "8001"))
@@ -40,16 +40,6 @@ async def root():
 @app.get("/health", response_model=HealthResponse)
 async def health():
     return {"status": "healthy"}
-
-
-@app.get("/debug")
-async def debug():
-    store = get_store()
-    return {
-        "chunks": len(store["chunks"]),
-        "embeddings": len(store["embeddings"]),
-        "metadatas": len(store["metadatas"]),
-    }
 
 
 @app.post("/chat", response_model=ChatResponse)
