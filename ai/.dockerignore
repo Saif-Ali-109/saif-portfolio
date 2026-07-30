@@ -1,0 +1,13 @@
+.env
+.env.local
+venv/
+.venv/
+__pycache__/
+*.pyc
+chroma_db/
+logs/
+.git
+.gitignore
+*.md
+.DS_Store
+tests/

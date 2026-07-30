@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fffbfb;
+  --foreground: #1c1917;
+  --accent: #e11d48;
+  --accent-light: #fb7185;
+  --muted: #78716c;
+  --border: #fce7f3;
+  --surface: #ffffff;
+}
+
+.dark {
+  --background: #080808;
+  --foreground: #f0f0f0;
+  --accent: #3b82f6;
+  --accent-light: #60a5fa;
+  --muted: #6b7280;
+  --border: #1a1a1a;
+  --surface: #111111;
+}
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: var(--accent);
+  color: #fff;
+}

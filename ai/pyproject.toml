@@ -1,0 +1,12 @@
+[project]
+name = "saif-ai"
+version = "1.0.0"
+description = "RAG-powered AI assistant for Saif Ali Wajid's portfolio."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "chromadb>=0.5.0",
+    "google-genai>=1.0.0",
+    "python-dotenv>=1.0.0",
+]
