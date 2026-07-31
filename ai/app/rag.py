@@ -11,7 +11,7 @@ from app.models import ChatMessage
 
 AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "0.7"))
 AI_MAX_OUTPUT_TOKENS = int(os.getenv("AI_MAX_OUTPUT_TOKENS", "250"))
-MAX_RETRIES = 3
+MAX_RETRIES = 2
 
 _client = None
 
@@ -42,9 +42,11 @@ def _try_model(client, model: str, contents, config):
                 return response.text.strip()
             return "I'm currently unable to process that request. Please try again."
         except Exception as e:
-            if "503" in str(e) or "UNAVAILABLE" in str(e):
+            # 503 (overloaded) and 429 (quota/RPM) are retryable and should
+            # fall through to the next model after retries are exhausted.
+            if any(code in str(e) for code in ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED")):
                 if attempt < MAX_RETRIES - 1:
-                    time.sleep(2 ** attempt)
+                    time.sleep(1)
                 continue
             raise
     return None
