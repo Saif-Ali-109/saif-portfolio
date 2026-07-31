@@ -10,7 +10,7 @@ from app.retriever import retrieve_context
 from app.models import ChatMessage
 
 AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "0.7"))
-AI_MAX_OUTPUT_TOKENS = int(os.getenv("AI_MAX_OUTPUT_TOKENS", "250"))
+AI_MAX_OUTPUT_TOKENS = int(os.getenv("AI_MAX_OUTPUT_TOKENS", "600"))
 MAX_RETRIES = 2
 
 _client = None
