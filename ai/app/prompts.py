@@ -20,3 +20,5 @@ Context:
 Question: {question}
 
 Answer concisely and professionally. If the context does not contain the answer, politely say so and guide the user to ask about Saif's profile."""
+
+GUARDRAIL_RESPONSE = "I'm Saif's assistant — I can only answer questions about Saif's skills, projects, education, and how to contact or hire him. Try asking about those!"

@@ -5,6 +5,7 @@ import google.genai as genai
 from google.genai import types
 
 from app.config import GEMINI_API_KEY, GEMINI_MODEL, FALLBACK_MODELS, MAX_HISTORY
+from app.guardrails import check_guardrail
 from app.prompts import SYSTEM_PROMPT, RAG_PROMPT_TEMPLATE
 from app.retriever import retrieve_context
 from app.models import ChatMessage
@@ -53,6 +54,10 @@ def _try_model(client, model: str, contents, config):
 
 
 def generate_response(user_message: str, history: list[ChatMessage]) -> str:
+    blocked = check_guardrail(user_message)
+    if blocked:
+        return blocked
+
     context = retrieve_context(user_message)
     prompt = RAG_PROMPT_TEMPLATE.format(context=context, question=user_message)
     contents = build_contents(history, prompt)
