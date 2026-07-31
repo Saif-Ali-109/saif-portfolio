@@ -1,25 +1,40 @@
 services:
   portfolio-ai:
-    build: ./portfolio/ai
+    build: ./ai
     ports:
       - "8001:8001"
     env_file:
-      - ./portfolio/ai/.env
+      # Required: create ai/.env with GEMINI_API_KEY. Missing file is not a
+      # hard error so `docker compose up` doesn't fail confusingly on a
+      # fresh clone (the container will log the missing key and exit).
+      - path: ./ai/.env
+        required: false
     environment:
       - HOST=0.0.0.0
       - PORT=8001
+      # Allow the browser frontend (served at :3000) to call the API.
+      - CORS_ORIGINS=http://localhost:3000
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   portfolio:
     build:
-      context: ./portfolio
+      context: .
       args:
-        - NEXT_PUBLIC_AI_API_URL=http://portfolio-ai:8001
+        # Browser-facing URL: must be reachable from the user's machine,
+        # NOT the Docker-internal hostname "portfolio-ai".
+        - NEXT_PUBLIC_AI_API_URL=http://localhost:8001
         - NEXT_PUBLIC_ALLOWED_DEV_ORIGINS=
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
     depends_on:
-      - portfolio-ai
+      portfolio-ai:
+        condition: service_healthy
     restart: unless-stopped

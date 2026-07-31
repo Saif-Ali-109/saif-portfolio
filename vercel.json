@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { "source": "/chat", "destination": "/api" },
-    { "source": "/health", "destination": "/api" },
-    { "source": "/ingest", "destination": "/api" }
+    { "source": "/chat", "destination": "/api/chat" },
+    { "source": "/health", "destination": "/api/health" },
+    { "source": "/ingest", "destination": "/api/ingest" }
   ]
 }

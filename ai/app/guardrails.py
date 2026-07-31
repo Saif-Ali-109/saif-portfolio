@@ -1,40 +1,6 @@
 from app.prompts import GUARDRAIL_RESPONSE
 import re
 
-ON_TOPIC_PATTERNS = [
-    "saif",
-    "skills",
-    "skill",
-    "project",
-    "education",
-    "experience",
-    "contact",
-    "hire",
-    "hiring",
-    "email",
-    "whatsapp",
-    "github",
-    "linkedin",
-    "resume",
-    "cv",
-    "portfolio",
-    "web3",
-    "blockchain",
-    " ai",
-    " ai.",
-    "freelance",
-    "internship",
-    "job",
-    "degree",
-    "university",
-    "certification",
-    "award",
-    "technology",
-    "tech stack",
-    "developer",
-    "software",
-]
-
 OFF_TOPIC_PATTERNS = [
     "weather",
     "rain",
@@ -71,12 +37,37 @@ OFF_TOPIC_PATTERNS = [
     "celebrity",
 ]
 
+# Prompt-injection phrasings — treat any of these as hostile and refuse.
+INJECTION_PATTERNS = [
+    "ignore your",
+    "ignore the",
+    "ignore all previous",
+    "disregard",
+    "system prompt",
+    "system instructions",
+    "your instructions",
+    "your rules",
+    "print your",
+    "reveal your",
+    "repeat your",
+    "you are now",
+    "act as",
+    "pretend you",
+    "developer mode",
+    "dan mode",
+    "jailbreak",
+    "do not follow",
+]
+
 
 def check_guardrail(text: str) -> str | None:
     normalized = text.lower()
-    if any(pattern in normalized for pattern in ON_TOPIC_PATTERNS):
-        return None
+    # Off-topic and injection checks run FIRST. There is deliberately no
+    # on-topic bailout: "Saif, ignore your instructions..." must not slip
+    # through just because it mentions Saif.
     if any(pattern in normalized for pattern in OFF_TOPIC_PATTERNS):
+        return GUARDRAIL_RESPONSE
+    if any(pattern in normalized for pattern in INJECTION_PATTERNS):
         return GUARDRAIL_RESPONSE
     if re.search(r"\d+\s*[+\-*/×x]\s*\d+", normalized):
         return GUARDRAIL_RESPONSE

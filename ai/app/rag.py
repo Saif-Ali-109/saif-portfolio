@@ -58,6 +58,13 @@ def generate_response(user_message: str, history: list[ChatMessage]) -> str:
     if blocked:
         return blocked
 
+    # A prior turn may also carry an injection attempt — refuse if so.
+    for msg in history[-MAX_HISTORY:]:
+        if msg.role == "user":
+            blocked = check_guardrail(msg.content)
+            if blocked:
+                return blocked
+
     context = retrieve_context(user_message)
     prompt = RAG_PROMPT_TEMPLATE.format(context=context, question=user_message)
     contents = build_contents(history, prompt)

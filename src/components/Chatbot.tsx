@@ -33,29 +33,48 @@ function getIconForUrl(url: string): string {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" width="13" height="13" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`;
 }
 
+const ESCAPE_MAP: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '`': '&#96;',
+};
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"'`]/g, (ch) => ESCAPE_MAP[ch]);
+}
+
+/** Strips attribute-breaking characters and only allows http(s) links. */
+function safeUrl(raw: string): string {
+  const clean = raw.replace(/[^a-zA-Z0-9\-._~:/?#@!$&*+,;=%[\]]/g, '');
+  return /^https?:\/\/\S+$/i.test(clean) ? clean : '#';
+}
+
 /** Converts a subset of Markdown to safe HTML for chat bubbles.
  *  Handles: [text](url), **bold**, * bullet items, newlines, and brand icons.
  */
 function renderMarkdown(text: string): string {
   return (
-    text
-      // Escape any existing HTML to prevent XSS
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
+    escapeHtml(text)
       // Bold: **text**
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       // Markdown links: [label](url) — with brand icons
       .replace(
         /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
-        (_match, label, url) =>
-          `${getIconForUrl(url)}<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;text-decoration:underline;">${label}</a>`
+        (_match, label, url) => {
+          const href = safeUrl(url);
+          return `${getIconForUrl(href)}<a href="${href}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;text-decoration:underline;">${label}</a>`;
+        }
       )
       // Plain bare URLs — with brand icons
       .replace(
         /(^|[\s(,])(https?:\/\/[^\s<)"]+)/g,
-        (_match, prefix, url) =>
-          `${prefix}${getIconForUrl(url)}<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;text-decoration:underline;">${url}</a>`
+        (_match, prefix, url) => {
+          const href = safeUrl(url);
+          return `${prefix}${getIconForUrl(href)}<a href="${href}" target="_blank" rel="noopener noreferrer" style="color:#60a5fa;text-decoration:underline;">${href}</a>`;
+        }
       )
       // Email addresses (e.g. rsaif6863322@gmail.com)
       .replace(

@@ -4,8 +4,8 @@ version = "1.0.0"
 description = "RAG-powered AI assistant for Saif Ali Wajid's portfolio."
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.115.0",
-    "uvicorn>=0.32.0",
-    "google-genai>=1.0.0",
-    "python-dotenv>=1.0.0",
+    "fastapi==0.139.0",
+    "uvicorn==0.50.0",
+    "google-genai==2.10.0",
+    "python-dotenv==1.2.2",
 ]
