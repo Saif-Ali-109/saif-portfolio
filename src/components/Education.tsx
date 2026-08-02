@@ -5,7 +5,7 @@ const Education = () => {
   return (
     <section id="education" className="py-8 px-6 border-t border-[var(--border)]">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-6">Education</h2>
+        <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-[var(--accent)] mb-8">Education</h2>
         <div className="border-l-2 border-gray-200 dark:border-[#1a1a1a] pl-8 ml-2 space-y-10">
           <div className="flex items-start gap-6">
             <Image src="/piaic-logo.png" alt="PIAIC" width={60} height={82} className="rounded-md shrink-0 mt-1" />

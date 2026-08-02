@@ -32,7 +32,7 @@ const Contact = () => {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <h2 className={`text-xs font-bold uppercase tracking-[0.4em] mb-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Collaboration</h2>
+          <h2 className={`text-xs font-bold uppercase tracking-[0.3em] mb-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Collaboration</h2>
           <p className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
             Ready to initiate <br /> a <span className="text-[var(--accent)]">new venture?</span>
           </p>

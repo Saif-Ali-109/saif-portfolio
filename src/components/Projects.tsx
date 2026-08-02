@@ -62,13 +62,13 @@ const Projects = () => {
                     <h3 className="text-4xl font-bold mb-4 tracking-tighter text-[var(--foreground)] group-hover:text-[var(--accent)] transition-colors">
                       {project.title}
                     </h3>
-                    <p className="text-[var(--accent)] font-bold text-[10px] uppercase tracking-[0.2em] mb-8">{project.type}</p>
+                    <p className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.2em] mb-8">{project.type}</p>
                     <p className="text-[var(--muted)] text-lg leading-relaxed mb-10 font-light">
                       {project.description}
                     </p>
                     <div className="flex flex-wrap gap-4 mb-10">
                       {project.stack.map((item) => (
-                        <span key={item} className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-[#1a1a1a]">
+                        <span key={item} className="text-xs font-bold text-gray-600 dark:text-gray-500 uppercase tracking-widest border-b border-gray-200 dark:border-[#1a1a1a]">
                           {item}
                         </span>
                       ))}

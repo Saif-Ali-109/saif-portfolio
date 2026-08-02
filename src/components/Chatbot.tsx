@@ -108,6 +108,8 @@ export default function Chatbot() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const lastUserMessageRef = useRef('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -165,6 +167,41 @@ export default function Chatbot() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        return;
+      }
+      if (e.key === 'Tab' && panelRef.current) {
+        const focusable = panelRef.current.querySelectorAll(
+          'button, input, [href], textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0] as HTMLElement;
+        const last = focusable[focusable.length - 1] as HTMLElement;
+        if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 250);
+    }
+  }, [isOpen]);
+
   // Save history to local storage when messages update
   useEffect(() => {
     if (messages.length > 0 && sessionId) {
@@ -177,6 +214,7 @@ export default function Chatbot() {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
 
+    lastUserMessageRef.current = text;
     setHasInteracted(true);
     setErrorMsg(null);
     const userMsg: Message = {
@@ -223,13 +261,6 @@ export default function Chatbot() {
         ? `Failed to connect to the AI assistant at ${apiUrl}.`
         : "Failed to connect to the AI assistant.";
       setErrorMsg(msg);
-      
-      const errorReply: Message = {
-        role: 'assistant',
-        content: "Sorry, I couldn't reach the server. We are currently unavailable for some time.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorReply]);
     } finally {
       setIsLoading(false);
       // Re-focus input so user can type immediately
@@ -264,11 +295,12 @@ export default function Chatbot() {
             exit={{ opacity: 0, y: 30, scale: 0.9 }}
             transition={{ type: 'spring', damping: 25, stiffness: 250 }}
             className="mb-4 w-[380px] h-[550px] bg-black/90 border border-white/10 rounded-2xl shadow-2xl flex flex-col backdrop-blur-xl overflow-hidden"
+            ref={panelRef}
           >
             {/* Header */}
             <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white relative">
+                <div className="w-9 h-9 bg-[var(--accent)] rounded-full flex items-center justify-center text-white relative">
                   <Bot size={18} />
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black" />
                 </div>
@@ -282,12 +314,14 @@ export default function Chatbot() {
                   onClick={handleResetSession}
                   className="p-2 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer"
                   title="Reset Session"
+                  aria-label="Reset conversation"
                 >
                   <RefreshCw size={15} />
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  aria-label="Close chat"
                 >
                   <X size={16} />
                 </button>
@@ -295,7 +329,7 @@ export default function Chatbot() {
             </div>
 
             {/* Message Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10" role="log" aria-live="polite" aria-relevant="additions">
               {messages.map((msg, index) => (
                 <div
                   key={index}
@@ -306,7 +340,7 @@ export default function Chatbot() {
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                       msg.role === 'user' 
-                        ? 'bg-blue-600 text-white' 
+                        ? 'bg-[var(--accent)] text-white' 
                         : 'bg-white/10 text-gray-300'
                     }`}
                   >
@@ -315,7 +349,7 @@ export default function Chatbot() {
                   <div
                     className={`p-3 rounded-xl text-xs leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-blue-600 text-white rounded-tr-none'
+                        ? 'bg-[var(--accent)] text-white rounded-tr-none'
                         : 'bg-white/10 text-gray-200 border border-white/5 rounded-tl-none'
                     }`}
                   >
@@ -347,6 +381,7 @@ export default function Chatbot() {
                 <div className="p-3 bg-red-950/40 border border-red-500/20 rounded-xl flex gap-2 items-start text-[10px] text-red-300">
                   <AlertCircle size={14} className="shrink-0 mt-0.5" />
                   <p>{errorMsg}</p>
+                  <button type="button" onClick={() => { if (lastUserMessageRef.current) handleSendMessage(lastUserMessageRef.current); }} className="shrink-0 px-2 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-200 rounded-md text-[10px] font-bold uppercase tracking-widest cursor-pointer">Retry</button>
                 </div>
               )}
 
@@ -360,7 +395,7 @@ export default function Chatbot() {
                   <button
                     key={i}
                     onClick={() => handleSendMessage(question)}
-                    className="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 rounded-full text-[10px] text-gray-300 hover:text-blue-400 transition-all text-left cursor-pointer"
+                    className="px-2.5 py-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[var(--accent)]/40 rounded-full text-[10px] text-gray-300 hover:text-[var(--accent)] transition-all text-left cursor-pointer"
                   >
                     {question}
                   </button>
@@ -382,13 +417,14 @@ export default function Chatbot() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask me about Saif's projects or skills..."
-                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 transition-colors"
+                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[var(--accent)]/50 transition-colors"
                 disabled={isLoading}
+                aria-label="Type your message"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-500 active:scale-95 disabled:bg-white/5 disabled:text-gray-600 disabled:scale-100 transition-all cursor-pointer"
+                className="w-8 h-8 rounded-xl bg-[var(--accent)] text-white flex items-center justify-center hover:bg-[var(--accent-light)] active:scale-95 disabled:bg-white/5 disabled:text-gray-600 disabled:scale-100 transition-all cursor-pointer"
               >
                 <Send size={14} />
               </button>
@@ -402,7 +438,9 @@ export default function Chatbot() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-blue-500 transition-colors relative"
+        className="w-14 h-14 bg-[var(--accent)] rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-[var(--accent-light)] transition-colors relative"
+        aria-label="Toggle AI assistant chat"
+        aria-expanded={isOpen}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
