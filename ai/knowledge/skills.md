@@ -18,7 +18,7 @@
 - OpenAI SDK, Claude API, Anthropic AI
 - Prompt Engineering, AI Agent Development
 - Model Context Protocol (MCP), Hooks Architecture
-- Google Gemini API, RAG pipelines, Vector databases (ChromaDB)
+- Google Gemini API, RAG pipelines (in-memory vector store)
 
 ## Cloud & DevOps
 - Cloudflare R2 (pre-signed URLs), Firebase Admin SDK, AWS S3

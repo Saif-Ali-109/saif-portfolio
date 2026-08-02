@@ -7,7 +7,7 @@ Developer portfolio for Saif Ali Wajid, built with Next.js 16 and a RAG-powered 
 - Next.js 16 + React 19
 - TypeScript + Tailwind CSS 4 (with `@custom-variant dark`)
 - Framer Motion
-- Python FastAPI (RAG chatbot backend with ChromaDB + Google Gemini)
+- Python FastAPI (RAG chatbot backend with in-memory vector store + Google Gemini)
 
 ## Featured Project: Connext
 
@@ -109,12 +109,10 @@ The chatbot at the bottom-right communicates with the Python backend at `http://
 ## Environment Variables
 
 ### Frontend
-The chatbot talks directly to the Python backend at `http://localhost:8001` (configure via `NEXT_PUBLIC_AI_API_URL` in `.env.local`).
+The chatbot talks directly to the Python backend at `http://localhost:8001` (configure via `NEXT_PUBLIC_AI_API_URL` in `.env.local`). For the Vercel serverless deployment, leave `NEXT_PUBLIC_AI_API_URL` empty (the chat calls `/chat` on the same origin) — see [Production Notes](#production-notes).
 
 ### Python Backend (`ai/.env`)
-- `GEMINI_API_KEY` — required for AI responses and embeddings
-- `GEMINI_MODEL` — optional, defaults to `gemini-2.5-flash`
-- `EMBEDDING_MODEL` — optional, defaults to `gemini-embedding-001`
+See the [Environment Variables (Backend)](#environment-variables-backend) table in Production Notes. Key security variables: set `TRUST_PROXY_HEADERS=true` and leave `API_TOKEN` and `CORS_ORIGINS` empty for the public Vercel chatbot (the browser widget sends no `Authorization` header). For local Docker use, set `CORS_ORIGINS=http://localhost:3000`.
 
 ## Commands Reference
 
@@ -125,6 +123,28 @@ The chatbot talks directly to the Python backend at `http://localhost:8001` (con
 
 ## Production Notes
 
-- The Python backend must be deployed separately (Railway, Render, or a VPS)
-- Update `Chatbot.tsx` with the production backend URL before deploying
-- See `documentation.md` for the full Connext technical documentation
+- **Local (Docker):** `docker-compose.yml` runs the AI backend on `8001` and the Next.js frontend on `3000`. It sets `NEXT_PUBLIC_AI_API_URL=http://localhost:8001` (line `docker-compose.yml`).
+- **Vercel (serverless):** the AI backend runs as a Vercel Python serverless function via `api/[[...path]].py`, which `vercel.json` routes from `/chat`, `/health`, `/ingest`. Because the function is deployed on the same domain as the frontend, `Chatbot.tsx` already defaults `NEXT_PUBLIC_AI_API_URL` to `""` (same-origin) — no manual file edit before deploying. Set `NEXT_PUBLIC_AI_API_URL=` (empty) on Vercel.
+- Security: do **not** set `API_TOKEN` for the public Vercel chatbot (the browser widget sends no `Authorization` header and the chat would break). Set `TRUST_PROXY_HEADERS=true`; leave `CORS_ORIGINS` empty (same-origin). For local Docker, set `CORS_ORIGINS=http://localhost:3000`.
+
+## Environment Variables (Backend)
+
+| Variable | Required | Default | Notes |
+|---|---|---|---|
+| `GEMINI_API_KEY` | Yes | — | Google Gemini API key (responses + embeddings) |
+| `GEMINI_MODEL` | No | `gemini-2.5-flash` | Primary response model |
+| `FALLBACK_MODELS` | No | `gemini-2.0-flash,gemini-1.5-flash` | Tried in order on 429/503 |
+| `EMBEDDING_MODEL` | No | `gemini-embedding-001` | Embedding model |
+| `KNOWLEDGE_DIR` | No | `./knowledge` (under `ai/`) | Knowledge base directory |
+| `CHUNK_SIZE` | No | `500` | RAG chunk size (chars) |
+| `CHUNK_OVERLAP` | No | `50` | RAG chunk overlap (chars) |
+| `TOP_K_RESULTS` | No | `3` | Retrieve top-K contexts |
+| `MAX_HISTORY` | No | `8` | Conversation turns kept per session |
+| `HOST` / `PORT` | No | `0.0.0.0` / `8001` | Local server bind (uvicorn) |
+| `API_TOKEN` | No | *(empty)* | Bearer auth for `/chat` + `/ingest`. **Do not set for the public Vercel chatbot.** |
+| `CORS_ORIGINS` | No | *(empty)* | Comma-separated allowlist (e.g. `http://localhost:3000`); same-origin Vercel = leave empty |
+| `RATE_LIMIT_PER_MINUTE` | No | `20` | Per-client-IP request limit (sliding window) |
+| `TRUST_PROXY_HEADERS` | No | `true` | Trust `X-Forwarded-For` (TRUE on Vercel/nginx; FALSE if directly exposed — else spoofable) |
+| `DOCS_ENABLED` | No | `false` | Enables `/docs` OpenAPI UI |
+| `AI_TEMPERATURE` | No | `0.7` | Generation temperature |
+| `AI_MAX_OUTPUT_TOKENS` | No | `250` | Max output tokens |

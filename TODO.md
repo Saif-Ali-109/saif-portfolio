@@ -26,4 +26,4 @@
 - [x] Fix `docker-compose.yml` paths + browser URL + CORS; pin deps; non-root Dockerfile
 - [x] Vercel `/api/*` catch-all routing (`api/[[...path]].py`) + prefix-strip middleware
 - [x] CSP corrected to documented "Without Nonces" pattern (hash-only broke hydration)
-- [x] Independent audit + QA subagent verification passed
+- [x] Documentation sync (docs vs code) reconciled; stale references removed

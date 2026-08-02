@@ -20,7 +20,7 @@ Next.js 15, React 19, TypeScript, Tailwind CSS, Express.js, PostgreSQL, Drizzle 
 - **Dark mode UI:** Polished dark theme with Framer Motion animations
 
 ### Links
-- Documentation: See `documentation.md` in the site root for full technical docs (project architecture, auth system, database schema, API reference, Socket.IO events, security)
+- Documentation: see the project README.md and the "Connext" section above for full technical details (authentication, architecture, API reference)
 - GitHub: https://github.com/Saif-Ali-109/Connext
 - Live: https://connext-frontend-production.up.railway.app/
 
@@ -32,5 +32,5 @@ Next.js 15, React 19, TypeScript, Tailwind CSS, Express.js, PostgreSQL, Drizzle 
 A modern single-page developer portfolio built with Next.js 16, React 19, and Tailwind CSS v4. Features an AI-powered chat assistant (Saifbot) that answers visitor questions using RAG (Retrieval-Augmented Generation). Supports crystal clear and dark themes.
 
 ### Tech Stack
-Next.js 16, React 19, TypeScript, Tailwind CSS v4, Framer Motion, FastAPI (Python RAG backend), ChromaDB, Google Gemini AI
+Next.js 16, React 19, TypeScript, Tailwind CSS v4, Framer Motion, FastAPI (Python RAG backend), Google Gemini AI
 
